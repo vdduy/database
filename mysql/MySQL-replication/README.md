@@ -91,10 +91,9 @@ Bước tiếp theo chúng ta cần phải cấp quyền và cho phép nhân b�
 CHANGE MASTER TO MASTER_HOST='12.34.56.789',MASTER_USER='slave_user', MASTER_PASSWORD='password', MASTER_LOG_FILE='mysql-bin.000001', MASTER_LOG_POS=  107;
 ```
 Nội dung command trên được hiểu như sau:
-
-    Chỉ định các máy chủ hiện tại như là slave của server master
-    Cung cấp thông tin đăng nhập chuẩn cho các máy chủ
-    Cuối cùng chỉ định cho các máy slave biết rằng cần phải sao lưu từ file log nào và đăng nhập từ vị trí mà đã định nghĩa trong position nào.
+Chỉ định các máy chủ hiện tại như là slave của server master
+Cung cấp thông tin đăng nhập chuẩn cho các máy chủ
+Cuối cùng chỉ định cho các máy slave biết rằng cần phải sao lưu từ file log nào và đăng nhập từ vị trí mà đã định nghĩa trong position nào.
 
 Sau đó chúng ta active server slave:
 ```
