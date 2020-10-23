@@ -1,5 +1,5 @@
 # Cách cài đặt MySQL Slave Replication
-Bước 1: Cấu hình Master Database
+**Bước 1**: Cấu hình Master Database
 ```
 sudo nano /etc/mysql/my.cnf
 ```
@@ -61,7 +61,8 @@ UNLOCK TABLES;
 QUIT;
 ```
 Về cơ bản cấu hình máy chủ đã tạm ổn
-Bước 2: Cấu hình cơ sở dữ liệu slave
+
+**Bước 2**: Cấu hình cơ sở dữ liệu slave
 
 Đăng nhập vào server slave, mở mysql là tạo cơ sở dữ liệu với tên giống hệt cơ sở dữ liệu master:
 ```
