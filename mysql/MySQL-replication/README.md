@@ -1,28 +1,20 @@
 # Cách cài đặt MySQL Slave Replication
 **Bước 1**: Cấu hình Master Database
 ```
-sudo nano /etc/mysql/my.cnf
+vi /etc/mysql/my.cnf
+
+[mysqld]
+...
+server-id=1
+log-bin=master
+binlog-format=row
+binlog-do-db=replica_db
 ```
-Bước đầu tiên phải tìm đến phần trông như sau để binding server master localhost chẳng hạn:
-```
-bind-address            = 127.0.0.1
-```
-Thay thế địa chỉ IP local thành địa chỉ của server. Ví dụ:
-```
-bind-address            = 12.34.56.789
-```
-Thay đổi tiếp theo đề cập đến các server-id, nằm trong phần [mysqlId]. Bạn có thể chọn bất kì số nào, ví dụ đơn giản nhất có thể đặt là 1.
-```
-server-id               = 1
-```
-Tiếp theo đặt đường dẫn file log cho mysql, tất cả các sự kiện của slave được lưu trữ trong đường dẫn này. Tìm đến dòng log_bin:
-```
-log_bin                 = /var/log/mysql/mysql-bin.log
-```
-Cuối cùng chúng ta cần phải chỉ định cơ sở dữ liệu sẽ được nhân bản trên các máy slave. Bạn có thể chỉ định thay vì một mà là nhiều các slave bằng cách lặp lại dòng này cho tất cả các cơ sở dữ liệu mà bạn cần:
-```
-binlog_do_db            = newdatabase
-```
+Trong đó :
+server_id là tùy chọn được sử dụng trong replication cho phép master server và slave server có thể nhận dạng lẫn nhau. Server_id Với mỗi server là khác nhau, nhận giá trị từ 1 đến 4294967295(mariadb >=10.2.2) và 0 đến 4294967295(mariadb =<10.2.1)
+log-bin hay log-basename là tên cơ sở nhật ký nhị phân để tạo tên tệp nhật ký nhị phân. binlog-format là định dạng dữ liệu được lưu trong file bin log.
+binlog-do-db là tùy chọn để nhận biết cơ sở dữ liệu nào sẽ được replication. Nếu muốn replication nhiều CSDL, bạn phải viết lại tùy chọn binlog-do-db nhiều lần. Hiện tại không có option cho phép chọn toàn bộ CSDL để replica mà bạn phải ghi tất cả CSDL muốn replica ra theo option này.
+
 Sau khi chỉnh sửa xong chúng ta cần lưu lại file cấu hình và khởi động lại mysql
 ```
 sudo service mysql restart
@@ -47,7 +39,7 @@ mysql> SHOW MASTER STATUS;
 +------------------+----------+--------------+------------------+
 | File             | Position | Binlog_Do_DB | Binlog_Ignore_DB |
 +------------------+----------+--------------+------------------+
-| mysql-bin.000001 |      107 | newdatabase  |                  |
+| master.000001    |      107 | newdatabase  |                  |
 +------------------+----------+--------------+------------------+
 1 row in set (0.00 sec)
 ```
@@ -76,11 +68,6 @@ mysql -u root -p newdatabase < /path/to/newdatabase.sql
 Chúng ta cần cấu hình những con slave giống hệt như cách mà chúng ta cấu hình con master. Tuy nhiên cũng cần chỉnh sửa một số thông số cho phù hợp như server-id:
 ```
 server-id               = 2
-
-relay-log               = /var/log/mysql/mysql-relay-bin.log
-
-log_bin                 = /var/log/mysql/mysql-bin.log
-
 binlog_do_db            = newdatabase
 ```
 Khởi động lại mysql của con slave:
@@ -89,7 +76,7 @@ sudo service mysql restart
 ```
 Bước tiếp theo chúng ta cần phải cấp quyền và cho phép nhân bản ở bên trong MySQL shell. Bật lại MySQL shell và thay thế các thông tin như sau:
 ```
-CHANGE MASTER TO MASTER_HOST='12.34.56.789',MASTER_USER='slave_user', MASTER_PASSWORD='password', MASTER_LOG_FILE='mysql-bin.000001', MASTER_LOG_POS=  107;
+CHANGE MASTER TO MASTER_HOST='12.34.56.789',MASTER_USER='slave_user', MASTER_PASSWORD='password', MASTER_LOG_FILE='master.000001', MASTER_LOG_POS= 107;
 ```
 Nội dung command trên được hiểu như sau:
 Chỉ định các máy chủ hiện tại như là slave của server master
@@ -101,13 +88,13 @@ Sau đó chúng ta active server slave:
 START SLAVE;
 
 // Kiểm tra bằng cách:
-SHOW SLAVE STATUS\G
+SHOW SLAVE STATUS\G;
 
 // Nếu có vấn đề trong kết nối bạn có thể thử start slave bằng cách:
-set global sql_slave_skip_counter=1; 
+SET GLOBAL sql_slave_skip_counter = N;
 SLAVE START;
 ```
-Trên đây là tất cả những gì tôi tìm hiểu được về MySQL Replication. Nó còn nhiều các góc cạnh khác nhau, đây chỉ là một trong những khía cạnh tôi tìm hiểu một cách khái quát.
+Thử N từ 1.
 
 
 
