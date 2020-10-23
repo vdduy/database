@@ -104,7 +104,8 @@ START SLAVE;
 SHOW SLAVE STATUS\G
 
 // Nếu có vấn đề trong kết nối bạn có thể thử start slave bằng cách:
-SET GLOBAL SQL_SLAVE_SKIP_COUNTER = 1; SLAVE START;
+set global sql_slave_skip_counter=1; 
+SLAVE START;
 ```
 Trên đây là tất cả những gì tôi tìm hiểu được về MySQL Replication. Nó còn nhiều các góc cạnh khác nhau, đây chỉ là một trong những khía cạnh tôi tìm hiểu một cách khái quát.
 
