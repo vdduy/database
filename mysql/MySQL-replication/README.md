@@ -25,7 +25,7 @@ GRANT REPLICATION SLAVE ON *.* TO 'slave_user'@'%' IDENTIFIED BY 'password';
 Sau đó kiểm tra bằng cách:
 FLUSH PRIVILEGES;
 ```
-Một điều quan trọng nữa, bạn cần phải mở 1 tab mới và lựa chọn cơ sở dữ liệu của bạn.
+Lựa chọn cơ sở dữ liệu cần replicate.
 ```
 USE newdatabase;
 ```
@@ -61,12 +61,14 @@ Về cơ bản cấu hình máy chủ đã tạm ổn
 CREATE DATABASE newdatabase;
 EXIT;
 ```
-Import cơ sở dữ liệu mà đã export ở bước 1.
+Copy newdatabase từ master sang slave rồi Import.
 ```
 mysql -u root -p newdatabase < /path/to/newdatabase.sql
 ```
 Chúng ta cần cấu hình những con slave giống hệt như cách mà chúng ta cấu hình con master. Tuy nhiên cũng cần chỉnh sửa một số thông số cho phù hợp như server-id:
 ```
+[mysqld]
+...
 server-id               = 2
 binlog_do_db            = newdatabase
 ```
